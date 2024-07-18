@@ -5,6 +5,7 @@ from app.schemas.user import UserCreate, UserLogin
 from app.core.security import verify_password
 from app.services import user as user_service
 from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError
+from app.services.user import authenticate_user
 
 router = APIRouter()
 
@@ -27,7 +28,8 @@ def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
 @router.post('/login')
 def login(user: UserLogin, db: Session = Depends(get_db)):
-    db_user = user_service.get_user_by_username(db, user.username)
-    if not db_user or not verify_password(user.password, db_user.hashed_password):
-        raise HTTPException(status_code=400,  detail="Incorrect username or password")
-    return {"message": "Login successful"}
+    try:
+        authenticate_user(db, user.username, user.password)
+        return {"message": "Login successful"}
+    except LookupError as e:
+        raise HTTPException(status_code=400, detail=str(e))
