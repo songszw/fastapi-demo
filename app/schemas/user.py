@@ -14,11 +14,6 @@ class UserLogin(UserBase):
     password: str
 
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
 class UpdatePasswordRequest(BaseModel):
     current_password: str
     new_password: str

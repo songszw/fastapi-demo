@@ -7,7 +7,7 @@ from app.db.session import get_db
 from app.schemas.user import UserCreate, UserLogin, UpdatePasswordRequest, LoginRequest
 from app.services import user as user_service
 from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError, LoginError
-from app.services.user import authenticate_user, login_for_access_token, update_user_password
+from app.services.user import login_for_access_token, update_user_password
 
 router = APIRouter()
 

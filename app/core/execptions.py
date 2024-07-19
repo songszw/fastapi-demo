@@ -14,3 +14,9 @@ class LoginError(Exception):
     def __init__(self, message="Incorrect username or password"):
         self.message = message
         super().__init__(self.message)
+
+
+class CategoryAlreadyExistsError(Exception):
+    def __init__(self, message="Category already exists"):
+        self.message = message
+        super().__init__(self.message)

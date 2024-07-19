@@ -2,26 +2,20 @@ from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
 from passlib.hash import bcrypt
+from sqlalchemy.orm import relationship
 
-from app.db.base_class import Base
+from app.db.base_class import BaseModel
 
 
-class User(Base):
-    __tablename__ = "users"
+class User(BaseModel):
+    __tablename__ = "user"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String(50), unique=True, index=True)
-    email = Column(String(100), unique=True, index=True)
+    username = Column(String(50), unique=True, index=True, comment="用户名称")
+    email = Column(String(100), unique=True, index=True, comment="用户邮箱")
     hashed_password = Column(String(255), nullable=False)
-    is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    is_active = Column(Boolean, default=True, comment="用户是否启用")
+    categories = relationship("Category", back_populates="user")
 
     def verify_password(self, password: str) -> bool:
         return bcrypt.verify(password, self.hashed_password)
-
-
-@event.listens_for(User, 'before_update')
-def receive_before_update(mapper, connection, target):
-    target.updated_at = datetime.now()
-
