@@ -1,10 +1,9 @@
 from datetime import datetime
 
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
-from sqlalchemy.ext.declarative import declarative_base
 from passlib.hash import bcrypt
 
-Base = declarative_base()
+from app.db.base_class import Base
 
 
 class User(Base):

@@ -73,7 +73,6 @@ def update_user_password(db: Session, user: User, current_password: str, new_pas
         db.commit()
         db.refresh(user)
     except Exception as e:
-        print(f"an error occurred: {e}")
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
     return user

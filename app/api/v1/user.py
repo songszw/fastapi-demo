@@ -50,5 +50,4 @@ def update_password(
     except HTTPException as e:
         raise e
     except Exception as e:
-        print('e', e)
         raise HTTPException(status_code=500, detail="Internal server error")
