@@ -17,3 +17,13 @@ class UserLogin(UserBase):
 class Token(BaseModel):
     access_token: str
     token_type: str
+
+
+class UpdatePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str

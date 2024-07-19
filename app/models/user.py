@@ -1,5 +1,8 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, func
+from datetime import datetime
+
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, func, event
 from sqlalchemy.ext.declarative import declarative_base
+from passlib.hash import bcrypt
 
 Base = declarative_base()
 
@@ -14,3 +17,12 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    def verify_password(self, password: str) -> bool:
+        return bcrypt.verify(password, self.hashed_password)
+
+
+@event.listens_for(User, 'before_update')
+def receive_before_update(mapper, connection, target):
+    target.updated_at = datetime.now()
+
