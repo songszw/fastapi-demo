@@ -20,3 +20,9 @@ class CategoryAlreadyExistsError(Exception):
     def __init__(self, message="Category already exists"):
         self.message = message
         super().__init__(self.message)
+
+
+class CategoryNotFoundError(Exception):
+    def __init__(self, message="Category not found"):
+        self.message = message
+        super().__init__(self.message)

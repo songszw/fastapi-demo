@@ -10,6 +10,7 @@ from app.models.user import User
 from app.schemas.token import Token
 from app.schemas.user import UserCreate
 from app.core.security import get_password_hash, verify_password, create_access_token
+from app.services.db_service import save_to_db
 
 
 def create_user(db: Session, user: UserCreate):
@@ -23,10 +24,7 @@ def create_user(db: Session, user: UserCreate):
         email=user.email,
         hashed_password=hashed_password
     )
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    return save_to_db(db, db_user)
 
 
 def get_user_by_username(db: Session, username: str):
@@ -68,11 +66,5 @@ def update_user_password(db: Session, user: User, current_password: str, new_pas
             detail="Current password is incorrect"
         )
     user.hashed_password = bcrypt.hash(new_password)
-    db.add(user)
-    try:
-        db.commit()
-        db.refresh(user)
-    except Exception as e:
-        db.rollback()
-        raise HTTPException(status_code=500, detail=str(e))
-    return user
+    return save_to_db(db, user)
+

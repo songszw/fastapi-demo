@@ -12,3 +12,4 @@ class Category(BaseModel):
     name = Column(String(50), index=True, comment="类目名称")
     user_id = Column(Integer, ForeignKey('user.id'), nullable=False, comment="类目所属用户id")
     user = relationship("User", back_populates="categories")
+    status = Column(Integer, default=1, nullable=False, comment="是否启用， 1启用， 0禁用")
