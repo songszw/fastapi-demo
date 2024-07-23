@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class CategoryBase(BaseModel):
     name: str
+    status: int = 1
 
 
 class CategoryCreate(CategoryBase):
