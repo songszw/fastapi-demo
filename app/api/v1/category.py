@@ -51,7 +51,7 @@ def get_categories(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.delete('/{category_id}', response_model=schemas.Category)
+@router.delete('/{category_id}', response_model=schemas.CategoryDelete)
 def delete_category(
         category_id: int,
         db: Session = Depends(deps.get_db),
@@ -59,6 +59,10 @@ def delete_category(
 ):
     try:
         result = category_service.delete_category(db, category_id, user_id=current_user.id)
-        return result
+        return {
+            "status": 200,
+            "message": "delete success",
+            "category_id": result.id
+        }
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

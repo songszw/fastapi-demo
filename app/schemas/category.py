@@ -19,3 +19,9 @@ class Category(CategoryBase):
 
     class Config:
         from_attributes = True
+
+
+class CategoryDelete(BaseModel):
+    status: int
+    message: str
+    category_id: int
