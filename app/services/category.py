@@ -44,11 +44,12 @@ def update_category(db: Session, category: CategoryUpdate, user_id: int) -> Cate
             Category.user_id == user_id,
             Category.id != category.id
         ).first()
-        if existing_category.status == 1:
-            raise CategoryAlreadyExistsError(f"Category with name '{category.name}' already exists.")
-        else:
-            existing_category.name = f"{existing_category.name}_old_{datetime.now()}"
-            save_to_db(db, existing_category)
+        if existing_category:
+            if existing_category.status == 1:
+                raise CategoryAlreadyExistsError(f"Category with name '{category.name}' already exists.")
+            else:
+                existing_category.name = f"{existing_category.name}_old_{datetime.now()}"
+                save_to_db(db, existing_category)
 
     for var, value in vars(category).items():
         setattr(db_category, var, value) if value else None

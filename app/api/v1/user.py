@@ -12,11 +12,6 @@ from app.services.user import login_for_access_token, update_user_password
 router = APIRouter()
 
 
-@router.get('/')
-def get_home():
-    return {"message": "hello world"}
-
-
 @router.post("/register")
 def register_user(user: UserCreate, db: Session = Depends(get_db)):
     try:

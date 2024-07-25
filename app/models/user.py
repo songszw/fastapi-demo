@@ -15,6 +15,8 @@ class User(BaseModel):
     email = Column(String(100), unique=True, index=True, comment="用户邮箱")
     hashed_password = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True, comment="用户是否启用")
+
+    entries = relationship("Entry", back_populates="user")
     categories = relationship("Category", back_populates="user")
 
     def verify_password(self, password: str) -> bool:
