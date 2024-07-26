@@ -63,7 +63,6 @@ def delete_category(db: Session, category_id: int, user_id: int):
         raise CategoryNotFoundError()
 
     entries = db.query(Entry).filter(Entry.category_id == category_id, Entry.status == 1).all()
-    print('entries', entries)
     if entries:
         raise CategoryDeleteError("Cannot delete category with active entries")
 
