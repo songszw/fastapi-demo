@@ -1,16 +1,19 @@
-from datetime import datetime
-from typing import List, Dict, Any
+from typing import List
 
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
 
+from app.core.execptions import CategoryNotFoundError
 from app.models import Entry, Category
 from app.schemas.entry import EntryCreate, CategoryEntry, EntryListResponseByCategory, Entry as EntrySchema
-from app.services import category
 from app.services.db_service import save_to_db
 
 
 def create_entry(db: Session, entry: EntryCreate, user_id):
+    db_category = db.query(Category).filter(Category.id == entry.category_id).first()
+    if not db_category:
+        raise CategoryNotFoundError("Category not found")
+
     db_entry = Entry(
         title=entry.title,
         content=entry.content,

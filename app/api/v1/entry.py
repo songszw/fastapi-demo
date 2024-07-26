@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import schemas, models
 from app.api import deps
+from app.core.execptions import CategoryNotFoundError
 from app.services import entry as entry_service
 
 router = APIRouter()
@@ -17,13 +18,14 @@ def create_entry(
         current_user: models.User = Depends(deps.get_current_user)
 ):
     try:
-        print(entry)
         new_entry = entry_service.create_entry(db, entry, user_id=current_user.id)
         return new_entry
+    except CategoryNotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
     except HTTPException as e:
         raise e
     except Exception as e:
-        raise HTTPException(status_code=500, detail="Internal server error")
+        raise HTTPException(status_code=500, detail=f"Internal server error{e}")
 
 
 @router.get('/', response_model=schemas.EntryListResponse)
