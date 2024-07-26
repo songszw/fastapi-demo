@@ -26,6 +26,12 @@ class CategoryNotFoundError(Exception):
     def __init__(self, message="Category not found"):
         self.message = message
         super().__init__(self.message)
+        
+
+class CategoryDeleteError(Exception):
+    def __init__(self, message="Category delete error"):
+        self.message = message
+        super().__init__(self.message)
 
 
 class EntryNotFoundError(Exception):

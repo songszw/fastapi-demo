@@ -3,8 +3,8 @@ from typing import List
 
 from sqlalchemy.orm import Session
 
-from app.core.execptions import CategoryAlreadyExistsError, CategoryNotFoundError
-from app.models import Category
+from app.core.execptions import CategoryAlreadyExistsError, CategoryNotFoundError, CategoryDeleteError
+from app.models import Category, Entry
 from app.schemas.category import CategoryBase, CategoryUpdate
 from app.services.db_service import save_to_db
 
@@ -61,6 +61,11 @@ def delete_category(db: Session, category_id: int, user_id: int):
     db_category = db.query(Category).filter(Category.id == category_id, Category.user_id == user_id).first()
     if not db_category:
         raise CategoryNotFoundError()
+
+    entries = db.query(Entry).filter(Entry.category_id == category_id, Entry.status == 1).all()
+    print('entries', entries)
+    if entries:
+        raise CategoryDeleteError("Cannot delete category with active entries")
 
     db_category.status = 0
     return save_to_db(db, db_category)
