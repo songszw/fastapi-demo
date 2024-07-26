@@ -7,10 +7,11 @@ class EntryBase(BaseModel):
     title: str
     content: str
     status: int = 1
+    category_id: int
 
 
 class EntryCreate(EntryBase):
-    category_id: int
+    pass
 
 
 class Entry(EntryBase):
@@ -18,6 +19,20 @@ class Entry(EntryBase):
 
     class Config:
         from_attributes = True
+
+
+class EntryUpdate(EntryBase):
+    id: int
+
+
+class EntryDelete(EntryBase):
+    pass
+
+
+class EntryDeleteResponse(BaseModel):
+    status: int
+    message: str
+    id: int
 
 
 class EntryListResponse(BaseModel):

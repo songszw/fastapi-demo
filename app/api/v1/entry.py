@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from app import schemas, models
 from app.api import deps
-from app.core.execptions import CategoryNotFoundError
+from app.core.execptions import CategoryNotFoundError, EntryNotFoundError
 from app.services import entry as entry_service
 
 router = APIRouter()
@@ -58,3 +58,39 @@ def get_entry_by_category(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error, {e}",)
+
+
+@router.put('/', response_model=schemas.Entry)
+def update_entry(
+        entry: schemas.EntryUpdate,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user)
+):
+    try:
+        entry_result = entry_service.update_entry(db, entry, user_id=current_user.id)
+        return entry_result
+    except EntryNotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except CategoryNotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error, {e}")
+
+
+@router.delete('/{entry_id}', response_model=schemas.EntryDeleteResponse)
+def delete_entry(
+        entry_id: int,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user)
+):
+    try:
+        result = entry_service.delete_entry(db, entry_id, user_id=current_user.id)
+        return result
+    except EntryNotFoundError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error, {e}")
