@@ -36,6 +36,7 @@ class EntryDeleteResponse(BaseModel):
 
 
 class EntryListResponse(BaseModel):
+    code: int
     total: int
     rows: List[Entry]
 
@@ -51,5 +52,6 @@ class CategoryEntry(BaseModel):
 
 
 class EntryListResponseByCategory(BaseModel):
+    code: int
     total: int
     rows: List[CategoryEntry]

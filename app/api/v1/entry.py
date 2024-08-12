@@ -11,7 +11,7 @@ from app.services import entry as entry_service
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.Entry)
+@router.post("", response_model=schemas.Entry)
 def create_entry(
         entry: schemas.EntryCreate,
         db: Session = Depends(deps.get_db),
@@ -28,7 +28,7 @@ def create_entry(
         raise HTTPException(status_code=500, detail=f"Internal server error{e}")
 
 
-@router.get('/', response_model=schemas.EntryListResponse)
+@router.get('', response_model=schemas.EntryListResponse)
 def get_entry(
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_user)
@@ -37,9 +37,11 @@ def get_entry(
         entry_list = entry_service.get_entry_list(db, user_id=current_user.id)
         total = len(entry_list)
         return {
+            "code": 200,
             "total": total,
             "rows": entry_list
         }
+
     except HTTPException as e:
         raise e
     except Exception as e:
@@ -60,7 +62,7 @@ def get_entry_by_category(
         raise HTTPException(status_code=500, detail=f"Internal server error, {e}",)
 
 
-@router.put('/', response_model=schemas.Entry)
+@router.put('', response_model=schemas.Entry)
 def update_entry(
         entry: schemas.EntryUpdate,
         db: Session = Depends(deps.get_db),

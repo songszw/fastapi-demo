@@ -56,6 +56,7 @@ def get_entry_list_by_category(db: Session, user_id: int) -> EntryListResponseBy
         category_result.append(category_data)
 
     return EntryListResponseByCategory(
+        code=200,
         total=len(category_result),
         rows=[CategoryEntry(**category) for category in category_result]
     )

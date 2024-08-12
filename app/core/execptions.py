@@ -38,3 +38,15 @@ class EntryNotFoundError(Exception):
     def __init__(self, message="Entry not found"):
         self.message = message
         super().__init__(self.message)
+
+
+class CustomException(Exception):
+    def __init__(self, code: int, message: str):
+        self.code = code
+        self.message = message
+
+
+class PasswordError(Exception):
+    def __init__(self, message="Current password is incorrect"):
+        self.message = message
+        super().__init__(self.message)

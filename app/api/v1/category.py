@@ -11,7 +11,7 @@ from app.services import category as category_service
 router = APIRouter()
 
 
-@router.post("/", response_model=schemas.Category)
+@router.post("", response_model=schemas.Category)
 def create_category(
         category: schemas.CategoryCreate,
         db: Session = Depends(deps.get_db),
@@ -24,7 +24,7 @@ def create_category(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.put("/", response_model=schemas.Category)
+@router.put("", response_model=schemas.Category)
 def update_category(
     category: schemas.CategoryUpdate,
     db: Session = Depends(deps.get_db),
@@ -39,7 +39,7 @@ def update_category(
         raise HTTPException(status_code=400, detail=str(e))
 
 
-@router.get('/', response_model=List[schemas.Category])
+@router.get('', response_model=List[schemas.Category])
 def get_categories(
         db: Session = Depends(deps.get_db),
         current_user: models.User = Depends(deps.get_current_user)

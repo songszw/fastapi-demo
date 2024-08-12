@@ -5,9 +5,8 @@ from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
-from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError, LoginError
+from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError, LoginError, PasswordError
 from app.models.user import User
-from app.schemas.token import Token
 from app.schemas.user import UserCreate
 from app.core.security import get_password_hash, verify_password, create_access_token
 from app.services.db_service import save_to_db
@@ -46,25 +45,19 @@ def login_for_access_token(db: Session, username: str, password: str):
     try:
         user = authenticate_user(db, username, password)
     except LoginError as e:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=e.message,
-            headers={"WWW-Authenticate": "Bearer"}
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail=str(e))
+
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user.username},
         expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    return {"access_token": access_token}
 
 
 def update_user_password(db: Session, user: User, current_password: str, new_password: str):
     if not user.verify_password(current_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Current password is incorrect"
-        )
+        raise PasswordError()
     user.hashed_password = bcrypt.hash(new_password)
     return save_to_db(db, user)
 
