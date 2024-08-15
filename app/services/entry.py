@@ -1,6 +1,6 @@
 from typing import List
 
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
 from app.core.execptions import CategoryNotFoundError, EntryNotFoundError
@@ -32,7 +32,7 @@ def get_entry_list_by_category(db: Session, user_id: int) -> EntryListResponseBy
     results = (
         db.query(Category, Entry)
         .outerjoin(Entry, and_(Category.id == Entry.category_id, Entry.user_id == user_id))
-        .filter(Category.user_id == user_id, Category.status == 1, Entry.status == 1)
+        .filter(Category.user_id == user_id, Category.status == 1, or_(Entry.status == 1, Entry.id.is_(None)))
         .all()
     )
 
