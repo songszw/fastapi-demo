@@ -55,3 +55,8 @@ class EntryListResponseByCategory(BaseModel):
     code: int
     total: int
     rows: List[CategoryEntry]
+
+
+class EntryInfoResponse(BaseModel):
+    code: int
+    data: Entry

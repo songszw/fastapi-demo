@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.core.execptions import CategoryNotFoundError, EntryNotFoundError
 from app.models import Entry, Category
 from app.schemas.entry import EntryCreate, CategoryEntry, EntryListResponseByCategory, Entry as EntrySchema, \
-    EntryUpdate, EntryDelete, EntryDeleteResponse
+    EntryUpdate, EntryDelete, EntryDeleteResponse, EntryInfoResponse
 from app.services.db_service import save_to_db
 
 
@@ -32,7 +32,7 @@ def get_entry_list_by_category(db: Session, user_id: int) -> EntryListResponseBy
     results = (
         db.query(Category, Entry)
         .outerjoin(Entry, and_(Category.id == Entry.category_id, Entry.user_id == user_id))
-        .filter(Category.user_id == user_id, Category.status == 1)
+        .filter(Category.user_id == user_id, Category.status == 1, Entry.status == 1)
         .all()
     )
 
@@ -73,7 +73,7 @@ def update_entry(db: Session, entry: EntryUpdate, user_id: int) -> Entry:
 
     db_entry.title = entry.title
     db_entry.content = entry.content
-    db_entry.category_id = entry.category_id
+    # db_entry.category_id = entry.category_id
 
     return save_to_db(db, db_entry)
 
@@ -88,4 +88,9 @@ def delete_entry(db: Session, entry_id: int, user_id: int) -> EntryDeleteRespons
     return EntryDeleteResponse(status=200, message="Entry delete success", id=db_entry.id)
 
 
+def get_entry_by_id(db: Session, entry_id: int, user_id: int) -> EntryInfoResponse:
+    db_entry = db.query(Entry).filter(entry_id == Entry.id,  Entry.user_id == user_id).first()
+    if not db_entry:
+        raise EntryNotFoundError()
 
+    return EntryInfoResponse(code=200, data=db_entry)

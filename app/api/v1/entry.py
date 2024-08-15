@@ -96,3 +96,16 @@ def delete_entry(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error, {e}")
+
+
+@router.get('/{entry_id}', response_model=schemas.EntryInfoResponse)
+def get_entry_by_id(
+        entry_id: int,
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user)
+):
+    try:
+        result = entry_service.get_entry_by_id(db, entry_id, user_id=current_user.id)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error, {e}")
