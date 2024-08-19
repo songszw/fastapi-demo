@@ -3,6 +3,7 @@ from typing import List
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import Session
 
+from app import schemas
 from app.core.execptions import CategoryNotFoundError, EntryNotFoundError
 from app.models import Entry, Category
 from app.schemas.entry import EntryCreate, CategoryEntry, EntryListResponseByCategory, Entry as EntrySchema, \
@@ -10,7 +11,7 @@ from app.schemas.entry import EntryCreate, CategoryEntry, EntryListResponseByCat
 from app.services.db_service import save_to_db
 
 
-def create_entry(db: Session, entry: EntryCreate, user_id):
+def create_entry(db: Session, entry: EntryCreate, user_id) -> schemas.Entry:
     db_category = db.query(Category).filter(Category.id == entry.category_id).first()
     if not db_category:
         raise CategoryNotFoundError("Category not found")
@@ -24,11 +25,12 @@ def create_entry(db: Session, entry: EntryCreate, user_id):
     return save_to_db(db, db_entry)
 
 
-def get_entry_list(db: Session, user_id: int) -> List[Entry]:
-    return db.query(Entry).filter(Entry.user_id == user_id, Entry.status == 1).all()
+def get_entry_list(db: Session, user_id: int) -> List[schemas.Entry]:
+    entries = db.query(Entry).filter(Entry.user_id == user_id, Entry.status == 1).all()
+    return [schemas.Entry.from_orm(entry) for entry in entries]
 
 
-def get_entry_list_by_category(db: Session, user_id: int) -> EntryListResponseByCategory:
+def get_entry_list_by_category(db: Session, user_id: int) -> List[schemas.CategoryEntry]:
     results = (
         db.query(Category, Entry)
         .outerjoin(Entry, and_(Category.id == Entry.category_id, Entry.user_id == user_id))
@@ -54,15 +56,10 @@ def get_entry_list_by_category(db: Session, user_id: int) -> EntryListResponseBy
     for category_id, category_data in category_dict.items():
         category_data["total"] = len(category_data["entry_list"])
         category_result.append(category_data)
-
-    return EntryListResponseByCategory(
-        code=200,
-        total=len(category_result),
-        rows=[CategoryEntry(**category) for category in category_result]
-    )
+    return [CategoryEntry(**category) for category in category_result]
 
 
-def update_entry(db: Session, entry: EntryUpdate, user_id: int) -> Entry:
+def update_entry(db: Session, entry: EntryUpdate, user_id: int) -> schemas.Entry:
     db_entry = db.query(Entry).filter(entry.id == Entry.id, Entry.user_id == user_id).first()
     if not db_entry:
         raise EntryNotFoundError()
@@ -78,14 +75,15 @@ def update_entry(db: Session, entry: EntryUpdate, user_id: int) -> Entry:
     return save_to_db(db, db_entry)
 
 
-def delete_entry(db: Session, entry_id: int, user_id: int) -> EntryDeleteResponse:
+def delete_entry(db: Session, entry_id: int, user_id: int) -> schemas.Entry:
     db_entry = db.query(Entry).filter(entry_id == Entry.id, Entry.user_id == user_id).first()
     if not db_entry:
         raise EntryNotFoundError()
 
     db_entry.status = 0
     save_to_db(db, db_entry)
-    return EntryDeleteResponse(status=200, message="Entry delete success", id=db_entry.id)
+    return db_entry
+    # return EntryDeleteResponse(status=200, message="Entry delete success", id=db_entry.id)
 
 
 def get_entry_by_id(db: Session, entry_id: int, user_id: int) -> EntryInfoResponse:

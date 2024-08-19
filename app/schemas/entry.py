@@ -2,6 +2,8 @@ from typing import List
 
 from pydantic import BaseModel
 
+from app.models import Category
+
 
 class EntryBase(BaseModel):
     title: str

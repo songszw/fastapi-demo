@@ -1,3 +1,5 @@
+from typing import List
+
 from pydantic import BaseModel
 
 
@@ -25,3 +27,20 @@ class CategoryDelete(BaseModel):
     status: int
     message: str
     category_id: int
+
+
+class CategoryInfoResponse(BaseModel):
+    code: int
+    data:  Category
+
+
+class CategoryDeleteResponse(BaseModel):
+    code: int
+    message: str
+    id: int
+
+
+class CategoryListResponse(BaseModel):
+    code: int
+    total: int
+    rows: List[Category]
