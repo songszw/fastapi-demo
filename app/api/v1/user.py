@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 
+from app import schemas, models
+from app.api import deps
 from app.api.deps import get_current_user
 from app.models.user import User
 from app.db.session import get_db
@@ -8,7 +10,7 @@ from app.schemas.response import ResponseModel
 from app.schemas.user import UserCreate, UserLogin, UpdatePasswordRequest, LoginRequest
 from app.services import user as user_service
 from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError, LoginError, CustomException, \
-    PasswordError
+    PasswordError, UserNotFoundError
 from app.services.user import login_for_access_token, update_user_password
 
 router = APIRouter()
@@ -62,3 +64,17 @@ def update_password(
         # 捕获其他异常并返回500错误
         print(f"Exception: {str(e)}")  # 打印异常信息
         raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.get('', response_model=schemas.ResponseDataModel[schemas.UserInfo])
+def user_info(
+        db: Session = Depends(deps.get_db),
+        current_user: models.User = Depends(deps.get_current_user)
+):
+    try:
+        result = user_service.get_user_info(db, user_id=current_user.id)
+        return schemas.ResponseDataModel(code=200, data=result, message="success")
+    except UserNotFoundError as e:
+        return schemas.ResponseDataModel(code=10006, message=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error, {e}")

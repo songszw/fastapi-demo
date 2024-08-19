@@ -4,8 +4,10 @@ from fastapi import HTTPException, status
 from pydantic import EmailStr
 from sqlalchemy.orm import Session
 
+from app import schemas
 from app.core.config import settings
-from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError, LoginError, PasswordError
+from app.core.execptions import UserEmailAlreadyExistsError, UsernameAlreadyExistsError, LoginError, PasswordError, \
+    UserNotFoundError
 from app.models.user import User
 from app.schemas.user import UserCreate
 from app.core.security import get_password_hash, verify_password, create_access_token
@@ -61,3 +63,9 @@ def update_user_password(db: Session, user: User, current_password: str, new_pas
     user.hashed_password = bcrypt.hash(new_password)
     return save_to_db(db, user)
 
+
+def get_user_info(db: Session, user_id: int) -> schemas.UserInfo:
+    db_user = db.query(User).filter(user_id == User.id).first()
+    if not db_user:
+        raise UserNotFoundError()
+    return db_user

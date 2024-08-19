@@ -22,3 +22,7 @@ class UpdatePasswordRequest(BaseModel):
 class LoginRequest(BaseModel):
     username: str
     password: str
+
+
+class UserInfo(UserBase):
+    email: str

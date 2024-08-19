@@ -87,15 +87,10 @@ def delete_entry(
 ):
     try:
         result = entry_service.delete_entry(db, entry_id, user_id=current_user.id)
-        return schemas.ResponseDeleteModel(
-            code=200,
-            message="success",
-            id=result.id
-        )
+        return schemas.ResponseDeleteModel(code=200, message="success", id=result.id)
     except EntryNotFoundError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    except HTTPException as e:
-        raise e
+        return schemas.ResponseDeleteModel(code=20003, message=str(e), id=entry_id)
+        # raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error, {e}")
 

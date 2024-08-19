@@ -50,3 +50,9 @@ class PasswordError(Exception):
     def __init__(self, message="Current password is incorrect"):
         self.message = message
         super().__init__(self.message)
+
+
+class UserNotFoundError(Exception):
+    def __init__(self, message="User not found"):
+        self.message = message
+        super().__init__(self.message)
