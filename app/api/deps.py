@@ -23,14 +23,14 @@ async def get_current_user(
         )
         username: str = payload.get("sub")
         if username is None:
-            raise CustomException(code=10006, message="username not exist")
+            raise CustomException(code=10006, message="USERNAME_NOT_EXIST")
         token_data = TokenData(username=username)
     except ExpiredSignatureError:
-        raise CustomException(code=40101, message="Token has expired")  # 处理过期的token
+        raise CustomException(code=40101, message="TOKEN_HAS_EXPIRED")  # 处理过期的token
     except (jwt.JWTError, ValidationError):
-        raise CustomException(code=40103, message="Token validation error")
+        raise CustomException(code=40103, message="TOKEN_VALIDATION_ERROR")
 
     user = db.query(User).filter(User.username == token_data.username).first()
     if user is None:
-        raise CustomException(code=10006, message="username not exist")
+        raise CustomException(code=10006, message="USERNAME_NOT_EXIST")
     return user

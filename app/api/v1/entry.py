@@ -53,7 +53,6 @@ def get_entry_by_category(
     try:
         entry_result = entry_service.get_entry_list_by_category(db, user_id=current_user.id)
         total = len(entry_result)
-        print(entry_result)
         return schemas.ResponseListModel(code=200, rows=entry_result, total=total)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error, {e}",)

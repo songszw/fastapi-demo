@@ -56,13 +56,11 @@ def update_password(
         )
         return ResponseModel(code=200, message="Password updated successfully")
     except PasswordError as e:
-        print(e)
         return ResponseModel(code=10005, message=str(e))
     except CustomException as e:
         return ResponseModel(code=e.code, message=e.message)
     except Exception as e:
         # 捕获其他异常并返回500错误
-        print(f"Exception: {str(e)}")  # 打印异常信息
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
