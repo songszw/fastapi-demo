@@ -13,14 +13,9 @@ from app.db.session import get_db
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
-async def get_current_user(
-        db: Session = Depends(get_db),
-        token: str = Depends(oauth2_scheme)
-) -> User:
+async def get_current_user(db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)) -> User:
     try:
-        payload = jwt.decode(
-            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
-        )
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
             raise CustomException(code=10006, message="USERNAME_NOT_EXIST")
